@@ -10,7 +10,9 @@ SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'dev-secret-placeholder')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost', '127.0.0.1']
+if os.environ.get('CODESPACE_NAME'):
+    ALLOWED_HOSTS.append(f"{os.environ.get('CODESPACE_NAME')}-8000.app.github.dev")
 
 # Application definition
 INSTALLED_APPS = [
@@ -74,13 +76,29 @@ TEMPLATES = [
 WSGI_APPLICATION = 'octofit_tracker.wsgi.application'
 
 # Database
-# Using default SQLite for development; switch to Djongo/MongoDB in production if desired
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Default: SQLite for development. If a MongoDB URI is provided via the
+# MONGO_URI environment variable the project will use Djongo to connect.
+if os.environ.get('MONGO_URI'):
+    DATABASES = {
+        'default': {
+            'ENGINE': 'djongo',
+            'NAME': os.environ.get('MONGO_DB_NAME', 'octofit_db'),
+            'CLIENT': {
+                'host': os.environ.get('MONGO_URI'),
+            },
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': BASE_DIR / 'db.sqlite3',
+        }
+    }
+
+# Helpful notes for running locally:
+# export MONGO_URI="mongodb://localhost:27017"
+# export MONGO_DB_NAME="octofit_db"
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -120,5 +138,18 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
+
+# CORS configuration
+# Set CORS_ALLOWED_ORIGINS as a comma-separated env var (e.g. "http://localhost:3000,http://127.0.0.1:3000")
+_cors_env = os.environ.get('CORS_ALLOWED_ORIGINS')
+if _cors_env:
+    CORS_ALLOWED_ORIGINS = [o.strip() for o in _cors_env.split(',') if o.strip()]
+else:
+    CORS_ALLOWED_ORIGINS = [
+        'http://localhost:3000',
+        'http://127.0.0.1:3000',
+    ]
+
+CORS_ALLOW_CREDENTIALS = True
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
