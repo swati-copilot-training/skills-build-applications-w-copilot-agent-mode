@@ -60,3 +60,15 @@ class TrackerModelsTest(TestCase):
         self.assertAlmostEqual(data[0]['total_distance_km'], 25.0, places=1)
         self.assertEqual(data[1]['user']['username'], 'bob')
 
+    def test_api_root(self):
+        # Root should return API links including activities
+        from rest_framework.test import APIClient
+        client = APIClient()
+        resp = client.get('/')
+        self.assertEqual(resp.status_code, 200)
+        data = resp.json()
+        self.assertIn('activities', data)
+        self.assertIn('teams', data)
+        self.assertIn('workouts', data)
+        self.assertIn('profile', data)
+

@@ -18,7 +18,8 @@ from django.urls import path, include
 from . import views
 
 urlpatterns = [
-    path('', views.root, name='root'),
+    # Root points to API root
+    path('', views.api_root, name='api-root'),
     path('health/', views.health, name='health'),
 
     path('admin/', admin.site.urls),

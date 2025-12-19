@@ -2,6 +2,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from .views import ActivityViewSet, ProfileView, TeamViewSet, WorkoutViewSet, LeaderboardView
 
+app_name = 'tracker'
+
 router = DefaultRouter()
 router.register(r'activities', ActivityViewSet, basename='activity')
 router.register(r'teams', TeamViewSet, basename='team')
