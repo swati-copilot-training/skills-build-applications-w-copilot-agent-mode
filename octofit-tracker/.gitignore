@@ -1,0 +1,10 @@
+# Ignore Python venv
+backend/venv/
+
+# Byte-compiled files
+**/__pycache__/
+**/*.py[cod]
+
+# Editor files
+.vscode/
+.idea/
